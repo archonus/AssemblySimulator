@@ -13,25 +13,34 @@ function run(){
 }
 
 function parseLine(expr){
-    const op = expr.substring(0,3).toUpperCase();
-    const operands = expr.substring(3).toUpperCase();
+    const parts = expr.split(" ")
+    const op = parts[0];
+    const operands = parts.slice(1); // Array of operands
     let opcode;
     switch (op) {
         case 'HLT':
-            opcode = 0;
-            break;
+            return 0; // Ignore everything else
         case 'ADD':
-            opcode = 1;
+            opcode = 0b1;
+            if (operands.length != 2){ // Needs 2 arguments
+                return null
+            }
+            let operand1 = parseInt(operands[0].substring(1))
+            let operand2 = parseInt(operands[1].substring(1))
+            if (isNaN(operand1) || isNaN(operand2)){
+                return null
+            }
+            return opcode.toString(2) + operand1.toString(2) + operand2.toString(2)
+
             break;
         case 'LDR':
-            opcode = 2;
+            opcode = 0b10;
             break;
         case 'STR':
-            opcode = 3;
+            opcode = 0b11;
             break;    
         default:
-            opcode = -1;
-            return null;
+            return null; // Not valid
     }
     
 }
@@ -46,6 +55,8 @@ function assemble(){
             alert("Could not parse");
             return;
         }
+        alert(byteCode)
+
     }
 }
 

@@ -16,6 +16,26 @@
             <label for="output">Machine Code</label>
             <textarea id="output" readonly cols="30" rows="10"></textarea>
         </div>
+        <div id="div_specialRegisters" class="block">
+            <table>
+                <tr>
+                    <td>
+                        <label>Program Counter</label>
+                    </td>
+                    <td>
+                        <div id="pc" class="txtbox"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Current Instruction Register</label>
+                    </td>
+                    <td>
+                        <div id="cir" class="txtbox"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <div id="div_mem" class="block">
             <table>
                 <tr>
@@ -28,7 +48,7 @@
                         <label>R0</label>
                     </td>
                     <td>
-                        <div id="r0" class="register"/>
+                        <div id="r0" class="register txtbox"/>
                     </td>
                     <td>
                         <input id="m0" class="mem_input"/>
@@ -39,7 +59,7 @@
                         <label>R1</label>
                     </td>
                     <td>
-                        <div id="r1" class="register"/>
+                        <div id="r1" class="register txtbox"/>
                     </td>
                     <td>
                         <input id="m1" class="mem_input"/>
@@ -50,7 +70,7 @@
                         <label>R2</label>
                     </td>
                     <td>
-                        <div id="r2" class="register"/>
+                        <div id="r2" class="register txtbox"/>
                     </td>
                     <td>
                         <input id="m2" class="mem_input"/>
@@ -61,7 +81,7 @@
                         <label>R3</label>
                     </td>
                     <td>
-                        <div id="r3" class="register"/>
+                        <div id="r3" class="register txtbox"/>
                     </td>
                     <td>
                         <input id="m3" class="mem_input"/>

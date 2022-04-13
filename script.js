@@ -2,14 +2,34 @@ const processor = {
     r:[0,0,0,0],
     pc:0,
     cir:0,
-    mar:0,
     m:[0,0,0,0],
+    instructions:[],
+
+
     get r_bits() {
         return Math.ceil(Math.log2(this.r.length));
         },
     get m_bits(){
         return Math.ceil(Math.log2(this.m.length))
     },
+
+
+    get PC(){
+        return this.pc;
+    },
+    set PC(val){
+        this.pc = val;
+    },
+
+
+    get CIR(){
+        return this.cir;
+    },
+    set CIR(val){
+        this.cir = val;
+    },
+
+
     getRegister(n){
         return this.r[n]
     },
@@ -23,6 +43,8 @@ const processor = {
             }
         );
     },
+
+
     getMemory(n){
         return this.m[n];
     },
@@ -36,7 +58,12 @@ const processor = {
             }
         );
     },
-    instructions:[]
+
+    runCycle(){
+        this.CIR = this.instructions[this.PC]
+        this.PC += 1
+        //TODO Implement this
+    }
 
 };
 

@@ -42,7 +42,7 @@ function parseRegister(regString){
     }
     let regNum = parseInt(regString.substring(1))
     if(isValidRegister(regNum)){
-        return regNum.toString(2).padStart(processor.r_bits)
+        return regNum.toString(2).padStart(processor.r_bits,'0')
     }
     else{
         return null;
@@ -77,7 +77,6 @@ function parseLine(expr){
     const op = parts[0];
     const operands = parts.slice(1); // Array of operands
     let opcode;
-    let addressMode;
     switch (op) {
         case 'HLT':
             return 0; // Ignore everything else
@@ -100,11 +99,17 @@ function parseLine(expr){
         return null;
     }
     let registerNum = parseRegister(operands[0])
-    let {op2,adrMode} = parseOperand2(operands[1],opcode);
+    let op2Details = parseOperand2(operands[1],opcode);
+    if(registerNum == null || op2Details == null){
+        return null;
+    }
+    return opcode + op2Details.adrMode + registerNum + op2Details.op2
 }
 
 function assemble(){
     const code_input = document.getElementById("code_input");
+    const txtArea_output = document.getElementById("output")
+    txtArea_output.innerHTML = "";
     const text = code_input.value;
     const lines = text.split('\n');
     for (const line of lines) {
@@ -113,7 +118,7 @@ function assemble(){
             alert("Could not parse");
             return;
         }
-        alert(byteCode)
+        txtArea_output.innerHTML += byteCode + '\n';
 
     }
 }
@@ -126,7 +131,7 @@ function autoResize(){
 
 const textareas = document.querySelectorAll("textarea"); //Get all the textarea and attach listeners
 textareas.forEach(element => {
-    element.addEventListener('input',autoResize);
+    element.addEventListener('selectionChanged',autoResize);
 });
 
 const btn_run = document.getElementById("btn_run")

@@ -22,18 +22,8 @@ function parseLine(expr){
             return 0; // Ignore everything else
         case 'ADD':
             opcode = 0b1;
-            if (operands.length != 2){ // Needs 2 arguments
-                return null
-            }
-            let operand1 = parseInt(operands[0].substring(1))
-            let operand2 = parseInt(operands[1].substring(1))
-            if (isNaN(operand1) || isNaN(operand2)){
-                return null
-            }
-            return opcode.toString(2) + operand1.toString(2) + operand2.toString(2)
-
             break;
-        case 'LDR':
+        case 'MOV':
             opcode = 0b10;
             break;
         case 'STR':
@@ -41,6 +31,14 @@ function parseLine(expr){
             break;    
         default:
             return null; // Not valid
+    }
+    if (operands.length != 2){ // Needs 2 arguments
+        return null
+    }
+    let operand1 = parseInt(operands[0].substring(1))
+    let operand2 = parseInt(operands[1].substring(1))
+    if (isNaN(operand1) || isNaN(operand2)){
+        return null
     }
     
 }

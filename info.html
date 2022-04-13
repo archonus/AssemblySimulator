@@ -9,11 +9,15 @@
         <p>Two bit opcode for four instructions:</p>
         <ul>
             <li>HLT</li>
-            <li>ADD</li>
-            <li>LDR</li>
-            <li>STR</li>
+            <li>
+                ADD Rn op2
+            </li>
+            <li>MOV Rn op2</li>
+            <li>STR Rn mref</li>
         </ul>
         <p>2 operands, each 2 bits long</p>
+        <p>Registers are indicated by Rn, where n is 0-3, and memory addresses are indicated by a number</p>
+        <p>op2 can be either a register or memory address</p>
         <a href="index.html">Back to Simulator</a>
     </body>
 </html>

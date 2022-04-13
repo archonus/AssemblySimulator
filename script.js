@@ -61,15 +61,45 @@ const processor = {
         );
     },
 
+    getOperand2(addressMode, op2str) {
+        switch (addressMode) {
+            case 0:
+                throw new Error("Not implemented");
+            case 1: // Register
+                var n = parseInt(op2str.substring(1),2);
+                return this.getRegister(n);
+            case 2: // Memory
+                var n = parseInt(op2str,2);
+                return this.getMemory(n);
+            default:
+                throw new Error("Invalid address mode");
+        }
+    },
+
+    add(addressMode, regNum, op2str){
+        const x = this.getRegister(regNum);
+        const y = this.getOperand2(addressMode, op2str);
+        this.setRegister(regNum,x+y);
+    },
+
     runCycle(){
         this.CIR = this.instructions[this.PC]
         this.PC += 1
-        //TODO Implement this
+        const opcode = this.CIR.substring(0,2) // TODO Convert this to constant OPCODE_SIZE
+        const addressMode = parseInt(this.CIR.substring(2,4),2); //Convert to number from binary string
+        const regNum = parseInt(this.CIR.substring(4,6),2);
+        const op2str = this.CIR.substring(6);
+        switch (opcode) {
+            case '01':
+                this.add(addressMode,regNum,op2str);
+                break;
+        
+            default:
+                break;
+        }
     }
 
 };
-
-
 
 function run(){
 
@@ -135,7 +165,7 @@ function parseLine(expr){
     let opcode;
     switch (op) {
         case 'HLT':
-            return 0; // Ignore everything else
+            return '0'; // Ignore everything else
         case 'ADD':
             opcode = '01';
             break;
@@ -181,12 +211,14 @@ function assemble(){
 function reset(){
     processor.instructions = [];
     processor.PC = 0;
+    processor.CIR = 0;
     for (let i = 0; i < processor.r.length; i++){
         processor.setRegister(i,0); 
     }
     for (let i = 0; i < processor.m.length; i++){
         processor.setMemory(i,0);
     }
+    txtArea_output.value = "";
 }
 
 function autoResize(){

@@ -11,4 +11,5 @@ textarea{
     width: 10em;
     height: 1em;
     border: 1px solid black;
+    padding: 1px;
 }

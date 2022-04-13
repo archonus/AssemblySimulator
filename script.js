@@ -23,6 +23,19 @@ const processor = {
             }
         );
     },
+    getMemory(n){
+        return this.m[n];
+    },
+    setMemory(n,val){
+        this.m[n] = val;
+        memoryInputs.forEach(
+            element => {
+                if(element.id == 'm' + n.toString()){
+                    element.value = val;
+                }
+            }
+        );
+    },
     instructions:[]
 
 };
@@ -168,4 +181,7 @@ btn_assemble.addEventListener('click',assemble)
 const registers = document.querySelectorAll('.register')
 for (let i = 0; i < processor.r.length; i++){
     processor.setRegister(i,0); 
+}
+for (let i = 0; i < processor.m.length; i++){
+    processor.setMemory(i,0);
 }

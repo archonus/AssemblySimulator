@@ -19,6 +19,7 @@ const processor = {
     },
     set PC(val){
         this.pc = val;
+        pc.innerHTML = val;
     },
 
 
@@ -27,6 +28,7 @@ const processor = {
     },
     set CIR(val){
         this.cir = val;
+        cir.innerHTML = val;
     },
 
 
@@ -121,7 +123,7 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
         if(!isValidMref(operand2)){
             throw new Error("Not a valid memory address");
         }
-        operand2 = operand2.toString(2).padStart(processor.m_bits);
+        operand2 = operand2.toString(2).padStart(processor.m_bits,'0');
     }
     return {op2: operand2, adrMode : addressMode};
 }
@@ -171,8 +173,20 @@ function assemble(){
         }
     }
     processor.instructions = instructions;
+    processor.PC = 0;
     txtArea_output.value = instructions.join('\n')
 
+}
+
+function reset(){
+    processor.instructions = [];
+    processor.PC = 0;
+    for (let i = 0; i < processor.r.length; i++){
+        processor.setRegister(i,0); 
+    }
+    for (let i = 0; i < processor.m.length; i++){
+        processor.setMemory(i,0);
+    }
 }
 
 function autoResize(){
@@ -191,8 +205,14 @@ function memoryChanged(){
     }
 }
 
+function btn_runClicked(){
+    processor.runCycle();
+}
+
 const code_input = document.getElementById("code_input");
 const txtArea_output = document.getElementById("output");
+const pc = document.getElementById("pc");
+const cir = document.getElementById("cir")
 const textareas = document.querySelectorAll("textarea"); //Get all the textarea and attach listeners
 textareas.forEach(element => {
     element.addEventListener('change',autoResize);
@@ -205,10 +225,8 @@ memoryInputs.forEach(element =>{
 const btn_assemble = document.getElementById("btn_assemble")
 btn_assemble.addEventListener('click',assemble)
 
-const registers = document.querySelectorAll('.register')
-for (let i = 0; i < processor.r.length; i++){
-    processor.setRegister(i,0); 
-}
-for (let i = 0; i < processor.m.length; i++){
-    processor.setMemory(i,0);
-}
+const btn_run = document.getElementById('btn_run');
+btn_run.addEventListener('click',btn_runClicked);
+
+const registers = document.querySelectorAll('.register');
+reset();

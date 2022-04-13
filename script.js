@@ -3,12 +3,25 @@ const processor = {
     pc:0,
     cir:0,
     mar:0,
-    memory:[0,0,0,0],
+    m:[0,0,0,0],
     get r_bits() {
         return Math.ceil(Math.log2(this.r.length));
         },
     get m_bits(){
-        return Math.ceil(Math.log2(this.memory.length))
+        return Math.ceil(Math.log2(this.m.length))
+    },
+    getRegister(n){
+        return this.r[n]
+    },
+    setRegister(n,val){
+        this.r[n] = val;
+        registers.forEach(
+            element =>{
+                if(element.id == 'r' + n.toString()){
+                    element.innerHTML = val;
+                }
+            }
+        );
     },
     instructions:[]
 
@@ -30,7 +43,7 @@ function isValidRegister(num){
 }
 
 function isValidMref(num){
-    if(isNaN(num) || num >= processor.memory.length){
+    if(isNaN(num) || num >= processor.m.length){
         return false;
     }
     else{
@@ -131,10 +144,10 @@ function memoryChanged(){
     const address = parseInt(this.id[1]);
     const temp = parseInt(this.value);
     if(isNaN(temp)){
-        this.value = processor.memory[address];
+        this.value = processor.m[address];
     }
     else{
-        processor.memory[address] = this.value;
+        processor.m[address] = temp;
     }
 }
 
@@ -151,3 +164,8 @@ memoryInputs.forEach(element =>{
 
 const btn_assemble = document.getElementById("btn_assemble")
 btn_assemble.addEventListener('click',assemble)
+
+const registers = document.querySelectorAll('.register')
+for (let i = 0; i < processor.r.length; i++){
+    processor.setRegister(i,0); 
+}

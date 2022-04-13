@@ -6,3 +6,9 @@
 textarea{
     display: block;
 }
+
+.register{
+    width: 10em;
+    height: 1em;
+    border: 1px solid black;
+}

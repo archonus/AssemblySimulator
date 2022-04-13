@@ -16,15 +16,22 @@
             <label for="output">Output</label>
             <textarea id="output" readonly cols="30" rows="10"></textarea>
         </div>
-        <div id="div_registers" class="block">
-            <label>Registers</label>
+        <div id="div_mem" class="block">
             <table>
+                <tr>
+                    <th>Registers</th>
+                    <th/>
+                    <th>Memory</th>
+                </tr>
                 <tr>
                     <td>
                         <label>R0</label>
                     </td>
                     <td>
-                        <p id="r0" class="register"/>
+                        <div id="r0" class="register"/>
+                    </td>
+                    <td>
+                        <input id="m0" class="mem_input"/>
                     </td>
                 </tr>
                 <tr>
@@ -32,7 +39,10 @@
                         <label>R1</label>
                     </td>
                     <td>
-                        <p id="r1" class="register"/>
+                        <div id="r1" class="register"/>
+                    </td>
+                    <td>
+                        <input id="m1" class="mem_input"/>
                     </td>
                 </tr>
                 <tr>
@@ -40,7 +50,10 @@
                         <label>R2</label>
                     </td>
                     <td>
-                        <p id="r2" class="register"/>
+                        <div id="r2" class="register"/>
+                    </td>
+                    <td>
+                        <input id="m2" class="mem_input"/>
                     </td>
                 </tr>
                 <tr>
@@ -48,37 +61,13 @@
                         <label>R3</label>
                     </td>
                     <td>
-                        <p id="r3" class="register"/>
+                        <div id="r3" class="register"/>
+                    </td>
+                    <td>
+                        <input id="m3" class="mem_input"/>
                     </td>
                 </tr>
             </table>
-        </div>
-        <div id="div_memory" class="block">
-            <label for="memory">Memory</label>
-            <form id="memory">
-                <table>
-                    <tr>
-                        <td>
-                            <input id="m0" class="mem_input"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input id="m1" class="mem_input"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input id="m2" class="mem_input"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input id="m3" class="mem_input"/>
-                        </td>
-                    </tr>
-                </table>
-            </form>
         </div>
         <script src="script.js" type="text/javascript"></script>
     </body>

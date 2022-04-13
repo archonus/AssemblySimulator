@@ -3,14 +3,21 @@ const processor = {
     pc:0,
     cir:0,
     m:[0,0,0,0],
+    halted:false,
     instructions:[],
-
+    OPCODE_SIZE: 2,
+    ADDRESS_MODES: 3,
 
     get r_bits() {
         return Math.ceil(Math.log2(this.r.length));
         },
     get m_bits(){
         return Math.ceil(Math.log2(this.m.length))
+    },
+
+        
+    get instructionSize(){
+        return this.OPCODE_SIZE + Math.ceil(Math.log2(this.ADDRESS_MODES)) + this.r_bits + this.m_bits;
     },
 
 
@@ -76,13 +83,33 @@ const processor = {
         }
     },
 
+    reset() {
+        this.PC = 0;
+        this.CIR = 0;
+        for (let i = 0; i < this.r.length; i++) {
+            this.setRegister(i, 0);
+        }
+        txtArea_output.value = "";
+        this.instructions = [];
+    },
+
     add(addressMode, regNum, op2str){
         const x = this.getRegister(regNum);
         const y = this.getOperand2(addressMode, op2str);
         this.setRegister(regNum,x+y);
     },
+    mov(addressMode,regNum,op2str){
+
+    },
+    halt(){ // Reset processor
+        this.reset();
+        this.halted = true;
+    },
 
     runCycle(){
+        if(this.halted){
+            return;
+        }
         this.CIR = this.instructions[this.PC]
         this.PC += 1
         const opcode = this.CIR.substring(0,2) // TODO Convert this to constant OPCODE_SIZE
@@ -93,8 +120,12 @@ const processor = {
             case '01':
                 this.add(addressMode,regNum,op2str);
                 break;
+            case '10':
+                this.mov(addressMode,regNum,op2str);
+                break;
         
             default:
+                this.halt();
                 break;
         }
     }
@@ -209,16 +240,11 @@ function assemble(){
 }
 
 function reset(){
-    processor.instructions = [];
-    processor.PC = 0;
-    processor.CIR = 0;
-    for (let i = 0; i < processor.r.length; i++){
-        processor.setRegister(i,0); 
-    }
+    processor.reset();
+    processor.halted = false;
     for (let i = 0; i < processor.m.length; i++){
         processor.setMemory(i,0);
     }
-    txtArea_output.value = "";
 }
 
 function autoResize(){

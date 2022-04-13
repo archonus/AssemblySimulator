@@ -9,7 +9,8 @@ const processor = {
         },
     get m_bits(){
         return Math.ceil(Math.log2(this.memory.length))
-    }
+    },
+    instructions:[]
 
 };
 
@@ -104,17 +105,21 @@ function assemble(){
     txtArea_output.innerHTML = "";
     const text = code_input.value;
     const lines = text.split('\n');
+    const instructions = [];
     for (const line of lines) {
         try {
             const byteCode = parseLine(line);
-            txtArea_output.innerHTML += byteCode + '\n';            
+            instructions.push(byteCode);        
         } 
         catch (err) {
             console.error(err);
-            txtArea_output.innerHTML = "";
+            return;
             // TODO Display error message            
         }
     }
+    processor.instructions = instructions;
+    txtArea_output.value = instructions.join('\n')
+
 }
 
 function autoResize(){

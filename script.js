@@ -101,8 +101,6 @@ function parseLine(expr){
 }
 
 function assemble(){
-    const code_input = document.getElementById("code_input");
-    const txtArea_output = document.getElementById("output")
     txtArea_output.innerHTML = "";
     const text = code_input.value;
     const lines = text.split('\n');
@@ -124,11 +122,27 @@ function autoResize(){
     this.style.height = this.scrollHeight + 'px';
 }
 
+function memoryChanged(){
+    const address = parseInt(this.id[1]);
+    const temp = parseInt(this.value);
+    if(isNaN(temp)){
+        this.value = processor.memory[address];
+    }
+    else{
+        processor.memory[address] = this.value;
+    }
+}
 
+const code_input = document.getElementById("code_input");
+const txtArea_output = document.getElementById("output");
 const textareas = document.querySelectorAll("textarea"); //Get all the textarea and attach listeners
 textareas.forEach(element => {
-    element.addEventListener('selectionChanged',autoResize);
+    element.addEventListener('change',autoResize);
+});
+const memoryInputs = document.querySelectorAll(".mem_input");
+memoryInputs.forEach(element =>{
+    element.addEventListener('change',memoryChanged);
 });
 
-const btn_run = document.getElementById("btn_run")
-btn_run.addEventListener('click',assemble)
+const btn_assemble = document.getElementById("btn_assemble")
+btn_assemble.addEventListener('click',assemble)

@@ -36,30 +36,40 @@ function isValidMref(num){
         return true;
     }
 }
+function parseRegister(regString){
+    if(regString[0] != 'R'){
+        return null;
+    }
+    let regNum = parseInt(regString.substring(1))
+    if(isValidRegister(regNum)){
+        return regNum.toString(2).padStart(processor.r_bits)
+    }
+    else{
+        return null;
+    }
+}
 
-function parseOperand2(op2String,opcode){
+function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode smarter
     let operand2;
-    let n;
+    let addressMode;
     if(op2String[0] == 'R'){
-        n = processor.r_bits;
+        addressMode = '01' // Register contents
         if(opcode == '11'){ // Str requires second operand to be mref
             return null;
         }
         else{
-            operand2 = parseInt(op2String.substring(1))
-            if(!isValidRegister(operand2)){
-                return null;
-            }
+            addressMode = '10' // Mref
+            operand2 = parseRegister(op2String)
         }
     }
     else{
-        n = processor.m_bits;
         operand2 = parseInt(operands[1]);
         if(!isValidMref(operand2)){
             return null;
         }
+        operand2 = operand2.toString(2).padStart(processor.m_bits)
     }
-    return operand2.toString(2).padStart(n); // Ensure it is padded to right size
+    return {op2: operand2, adrMode : addressMode};
 }
 
 function parseLine(expr){
@@ -89,11 +99,8 @@ function parseLine(expr){
     if(operands[0][0] != 'R'){
         return null;
     }
-    let registerNum = parseInt(operands[0].substring(1))
-    if(!isValidRegister(registerNum)){
-        return null;
-    }
-    let operand2 = parseOperand2(operands[1],opcode);
+    let registerNum = parseRegister(operands[0])
+    let {op2,adrMode} = parseOperand2(operands[1],opcode);
 }
 
 function assemble(){

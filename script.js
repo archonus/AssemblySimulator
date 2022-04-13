@@ -38,14 +38,14 @@ function isValidMref(num){
 }
 function parseRegister(regString){
     if(regString[0] != 'R'){
-        return null;
+        throw new Error("Not a register");
     }
     let regNum = parseInt(regString.substring(1))
     if(isValidRegister(regNum)){
         return regNum.toString(2).padStart(processor.r_bits,'0')
     }
     else{
-        return null;
+        throw new Error("Invalid regiser number");
     }
 }
 
@@ -55,22 +55,19 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
     if(op2String[0] == 'R'){
         addressMode = '01' // Register contents
         if(opcode == '11'){ // Str requires second operand to be mref
-            return null;
+            throw new Error("Str requires a memory address as second operand")
         }
         else{
-            operand2 = parseRegister(op2String)
-            if(operand2 == null){
-                return null;
-            }
+            operand2 = parseRegister(op2String);
         }
     }
     else{
         addressMode = '10' // Mref
         operand2 = parseInt(op2String);
         if(!isValidMref(operand2)){
-            return null;
+            throw new Error("Not a valid memory address");
         }
-        operand2 = operand2.toString(2).padStart(processor.m_bits)
+        operand2 = operand2.toString(2).padStart(processor.m_bits);
     }
     return {op2: operand2, adrMode : addressMode};
 }
@@ -96,16 +93,10 @@ function parseLine(expr){
             return null; // Not valid
     }
     if (operands.length != 2){ // Needs 2 arguments
-        return null
-    }
-    if(operands[0][0] != 'R'){
-        return null;
+        throw new Error("Invalid syntax");
     }
     let registerNum = parseRegister(operands[0])
     let op2Details = parseOperand2(operands[1],opcode);
-    if(registerNum == null || op2Details == null){
-        return null;
-    }
     return opcode + op2Details.adrMode + registerNum + op2Details.op2
 }
 
@@ -116,13 +107,15 @@ function assemble(){
     const text = code_input.value;
     const lines = text.split('\n');
     for (const line of lines) {
-        const byteCode = parseLine(line);
-        if(byteCode == null){
-            alert("Could not parse");
-            return;
+        try {
+            const byteCode = parseLine(line);
+            txtArea_output.innerHTML += byteCode + '\n';            
+        } 
+        catch (err) {
+            console.error(err);
+            txtArea_output.innerHTML = "";
+            // TODO Display error message            
         }
-        txtArea_output.innerHTML += byteCode + '\n';
-
     }
 }
 

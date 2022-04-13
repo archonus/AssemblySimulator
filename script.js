@@ -58,12 +58,15 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
             return null;
         }
         else{
-            addressMode = '10' // Mref
             operand2 = parseRegister(op2String)
+            if(operand2 == null){
+                return null;
+            }
         }
     }
     else{
-        operand2 = parseInt(operands[1]);
+        addressMode = '10' // Mref
+        operand2 = parseInt(op2String);
         if(!isValidMref(operand2)){
             return null;
         }

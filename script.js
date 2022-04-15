@@ -146,6 +146,11 @@ const processor = {
         this.halted = true; // Set halted to true - once halted cannot run until instructions restored
     },
 
+    store(regNum, mref){
+        const x = this.getRegisterValue(regNum);
+        this.setMemory(mref,x);
+    },
+
     runCycle(){
         if(this.halted){
             return;
@@ -166,7 +171,9 @@ const processor = {
             case 2:
                 this.mov(regNum,op2);
                 break;
-        
+            case 3:
+                this.store(regNum,instr.operand2);
+                break;       
             default:
                 this.halt();
                 break;

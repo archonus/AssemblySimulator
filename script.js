@@ -9,6 +9,10 @@ class instruction{
     }
     OPCODE_SIZE = 2;
     ADDRESS_MODES = 3;
+
+    static get haltInstr(){
+        return new instruction(0,0,0,0);
+    }
     get Op2Size(){
         return Math.max(processor.r_bits, processor.m_bits);
     }
@@ -35,7 +39,7 @@ function numBits(n){
 const processor = {
     r:[0,0,0,0],
     pc:0,
-    cir:0,
+    cir:'0',
     m:[0,0,0,0],
     halted:false,
     instructions:[],
@@ -102,16 +106,14 @@ const processor = {
         );
     },
 
-    getOperand2(addressMode, op2str) {
+    getOperand2(addressMode, op2) {
         switch (addressMode) {
             case 0:
                 throw new Error("Not implemented");
             case 1: // Register
-                var n = parseInt(op2str.substring(1),2);
-                return this.getRegisterValue(n);
+                return this.getRegisterValue(op2);
             case 2: // Memory
-                var n = parseInt(op2str,2);
-                return this.getMemoryValue(n);
+                return this.getMemoryValue(op2);
             default:
                 throw new Error("Invalid address mode");
         }
@@ -119,7 +121,7 @@ const processor = {
 
     reset() { // Set registers to 0 and clear instructions
         this.PC = 0;
-        this.CIR = 0;
+        this.CIR = '0';
         for (let i = 0; i < this.r.length; i++) {
             this.setRegister(i, 0);
         }
@@ -127,14 +129,12 @@ const processor = {
         this.instructions = [];
     },
 
-    add(addressMode, regNum, op2str){
+    add(regNum, op2){
         const x = this.getRegisterValue(regNum);
-        const y = this.getOperand2(addressMode, op2str);
-        this.setRegister(regNum,x+y);
+        this.setRegister(regNum,x+op2);
     },
-    mov(addressMode,regNum,op2str){
-        const val = this.getOperand2(addressMode,op2str);
-        this.setRegister(regNum,val);
+    mov(regNum,op2){
+        this.setRegister(regNum,op2);
     },
     halt(){ // Reset processor
         this.reset();
@@ -145,18 +145,19 @@ const processor = {
         if(this.halted){
             return;
         }
-        this.CIR = this.instructions[this.PC]
+        const instr = this.instructions[this.PC]
         this.PC += 1
-        const opcode = this.CIR.substring(0,2) // TODO Convert this to constant OPCODE_SIZE
-        const addressMode = parseInt(this.CIR.substring(2,4),2); //Convert to number from binary string
-        const regNum = parseInt(this.CIR.substring(4,6),2); //Parse as binary
-        const op2str = this.CIR.substring(6);
+        this.CIR = instr.toString();
+        const opcode = instr.opcode;
+        const addressMode = instr.addressMode;
+        const regNum = instr.regNum;
+        const op2 = this.getOperand2(addressMode, instr.operand2);
         switch (opcode) {
-            case '01':
-                this.add(addressMode,regNum,op2str);
+            case 1:
+                this.add(regNum,op2);
                 break;
-            case '10':
-                this.mov(addressMode,regNum,op2str);
+            case 2:
+                this.mov(regNum,op2);
                 break;
         
             default:
@@ -230,7 +231,7 @@ function parseLine(expr){
     let opcode;
     switch (op) {
         case 'HLT':
-            return instruction(0,0,0,0); // Ignore everything else
+            return instruction.haltInstr; // Ignore everything else
         case 'ADD':
             opcode = 1;
             break;

@@ -156,8 +156,8 @@ const processor = {
             return;
         }
         const instr = this.instructions[this.PC]
-        this.PC += 1
         this.CIR = instr.toString();
+        this.PC += 1
         const opcode = instr.opcode;
         const addressMode = instr.addressMode;
         const regNum = instr.regNum;
@@ -182,7 +182,7 @@ const processor = {
 
 };
 
-function run(){
+function run(){ // TODO : Implement run all
 
 }
 
@@ -216,7 +216,7 @@ function parseRegister(regString){
     }
 }
 
-function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode smarter
+function parseOperand2(op2String,opcode){
     let operand2;
     let addressMode;
     if(op2String[0] == 'R'){
@@ -320,7 +320,13 @@ function memoryChanged(){
 }
 
 function btn_runClicked(){
-    processor.runCycle();
+    try{
+        processor.runCycle();
+    }
+    catch(err){ // TODO Display error
+        console.error(err);
+        processor.halt();
+    }
 }
 
 const code_input = document.getElementById("code_input");

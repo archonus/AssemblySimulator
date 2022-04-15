@@ -122,6 +122,7 @@ const processor = {
     reset() { // Set registers to 0 and clear instructions
         this.PC = 0;
         this.CIR = '0';
+        this.halted = false;
         for (let i = 0; i < this.r.length; i++) {
             this.setRegister(i, 0);
         }
@@ -153,6 +154,8 @@ const processor = {
         const regNum = instr.regNum;
         const op2 = this.getOperand2(addressMode, instr.operand2);
         switch (opcode) {
+            case 0:
+                this.halt();
             case 1:
                 this.add(regNum,op2);
                 break;
@@ -273,7 +276,6 @@ function assemble(){
 
 function reset(){
     processor.reset();
-    processor.halted = false;
     for (let i = 0; i < processor.m.length; i++){
         processor.setMemory(i,0);
     }

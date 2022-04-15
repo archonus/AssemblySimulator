@@ -8,6 +8,13 @@ const processor = {
     OPCODE_SIZE: 2,
     ADDRESS_MODES: 3,
 
+    loadInstructions(instructions){
+        this.instructions = instructions;
+        this.PC = 0;
+        this.halted = false;
+        txtArea_output.value = instructions.join('\n');
+    },
+
     get r_bits() {
         return Math.ceil(Math.log2(this.r.length));
         },
@@ -39,7 +46,7 @@ const processor = {
     },
 
 
-    getRegister(n){
+    getRegisterValue(n){
         return this.r[n]
     },
     setRegister(n,val){
@@ -54,7 +61,7 @@ const processor = {
     },
 
 
-    getMemory(n){
+    getMemoryValue(n){
         return this.m[n];
     },
     setMemory(n,val){
@@ -74,16 +81,16 @@ const processor = {
                 throw new Error("Not implemented");
             case 1: // Register
                 var n = parseInt(op2str.substring(1),2);
-                return this.getRegister(n);
+                return this.getRegisterValue(n);
             case 2: // Memory
                 var n = parseInt(op2str,2);
-                return this.getMemory(n);
+                return this.getMemoryValue(n);
             default:
                 throw new Error("Invalid address mode");
         }
     },
 
-    reset() {
+    reset() { // Set registers to 0 and clear instructions
         this.PC = 0;
         this.CIR = 0;
         for (let i = 0; i < this.r.length; i++) {
@@ -94,16 +101,17 @@ const processor = {
     },
 
     add(addressMode, regNum, op2str){
-        const x = this.getRegister(regNum);
+        const x = this.getRegisterValue(regNum);
         const y = this.getOperand2(addressMode, op2str);
         this.setRegister(regNum,x+y);
     },
     mov(addressMode,regNum,op2str){
-
+        const val = this.getOperand2(addressMode,op2str);
+        this.setRegister(regNum,val);
     },
     halt(){ // Reset processor
         this.reset();
-        this.halted = true;
+        this.halted = true; // Set halted to true - once halted cannot run until instructions restored
     },
 
     runCycle(){
@@ -114,7 +122,7 @@ const processor = {
         this.PC += 1
         const opcode = this.CIR.substring(0,2) // TODO Convert this to constant OPCODE_SIZE
         const addressMode = parseInt(this.CIR.substring(2,4),2); //Convert to number from binary string
-        const regNum = parseInt(this.CIR.substring(4,6),2);
+        const regNum = parseInt(this.CIR.substring(4,6),2); //Parse as binary
         const op2str = this.CIR.substring(6);
         switch (opcode) {
             case '01':
@@ -226,17 +234,14 @@ function assemble(){
         try {
             const byteCode = parseLine(line);
             instructions.push(byteCode);        
-        } 
+        }
         catch (err) {
             console.error(err);
             return;
             // TODO Display error message            
         }
     }
-    processor.instructions = instructions;
-    processor.PC = 0;
-    txtArea_output.value = instructions.join('\n')
-
+    processor.loadInstructions(instructions);
 }
 
 function reset(){

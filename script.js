@@ -1,3 +1,37 @@
+"use strict";
+
+class instruction{
+    constructor(opcode, addressMode, regNum, op2){
+        this.opcode = opcode;
+        this.addressMode = addressMode;
+        this.regNum = regNum;
+        this.operand2 = op2;
+    }
+    OPCODE_SIZE = 2;
+    ADDRESS_MODES = 3;
+    get Op2Size(){
+        return Math.max(processor.r_bits, processor.m_bits);
+    }
+
+    get instructionSize(){
+        return this.OPCODE_SIZE + numBits(this.ADDRESS_MODES) + processor.r_bits + this.Op2Size;
+    }
+    static getBinaryRepresentation(num, length){
+        return num.toString(2).padStart(length,'0');
+    }
+
+    toString(){
+        return instruction.getBinaryRepresentation(this.opcode, this.OPCODE_SIZE) 
+        + instruction.getBinaryRepresentation(this.addressMode,numBits(this.ADDRESS_MODES)) 
+        + instruction.getBinaryRepresentation(this.regNum,processor.r_bits) 
+        + instruction.getBinaryRepresentation(this.operand2,this.Op2Size);
+    }
+}
+
+function numBits(n){
+    return Math.ceil(Math.log2(n));
+}
+
 const processor = {
     r:[0,0,0,0],
     pc:0,
@@ -5,26 +39,19 @@ const processor = {
     m:[0,0,0,0],
     halted:false,
     instructions:[],
-    OPCODE_SIZE: 2,
-    ADDRESS_MODES: 3,
 
     loadInstructions(instructions){
         this.instructions = instructions;
         this.PC = 0;
         this.halted = false;
-        txtArea_output.value = instructions.join('\n');
+        txtArea_output.value = instructions.map(instr => instr.toString()).join('\n');
     },
 
     get r_bits() {
-        return Math.ceil(Math.log2(this.r.length));
+        return numBits(this.r.length);
         },
     get m_bits(){
-        return Math.ceil(Math.log2(this.m.length))
-    },
-
-        
-    get instructionSize(){
-        return this.OPCODE_SIZE + Math.ceil(Math.log2(this.ADDRESS_MODES)) + this.r_bits + this.m_bits;
+        return numBits(this.m.length);
     },
 
 
@@ -167,7 +194,7 @@ function parseRegister(regString){
     }
     let regNum = parseInt(regString.substring(1))
     if(isValidRegister(regNum)){
-        return regNum.toString(2).padStart(processor.r_bits,'0')
+        return regNum
     }
     else{
         throw new Error("Invalid regiser number");
@@ -178,8 +205,8 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
     let operand2;
     let addressMode;
     if(op2String[0] == 'R'){
-        addressMode = '01' // Register contents
-        if(opcode == '11'){ // Str requires second operand to be mref
+        addressMode = 1 // Register contents
+        if(opcode == 3){ // Str requires second operand to be mref
             throw new Error("Str requires a memory address as second operand")
         }
         else{
@@ -187,12 +214,11 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
         }
     }
     else{
-        addressMode = '10' // Mref
+        addressMode = 2 // Mref
         operand2 = parseInt(op2String);
         if(!isValidMref(operand2)){
             throw new Error("Not a valid memory address");
         }
-        operand2 = operand2.toString(2).padStart(processor.m_bits,'0');
     }
     return {op2: operand2, adrMode : addressMode};
 }
@@ -204,25 +230,25 @@ function parseLine(expr){
     let opcode;
     switch (op) {
         case 'HLT':
-            return '0'; // Ignore everything else
+            return instruction(0,0,0,0); // Ignore everything else
         case 'ADD':
-            opcode = '01';
+            opcode = 1;
             break;
         case 'MOV':
-            opcode = '10';
+            opcode = 2;
             break;
         case 'STR':
-            opcode = '11';
+            opcode = 3;
             break;    
         default:
-            return null; // Not valid
+            throw Error("Not valid operation"); // Not valid
     }
     if (operands.length != 2){ // Needs 2 arguments
         throw new Error("Invalid syntax");
     }
     let registerNum = parseRegister(operands[0])
-    let op2Details = parseOperand2(operands[1],opcode);
-    return opcode + op2Details.adrMode + registerNum + op2Details.op2
+    let {op2,adrMode} = parseOperand2(operands[1],opcode);
+    return new instruction(opcode,adrMode,registerNum,op2);
 }
 
 function assemble(){
@@ -232,8 +258,8 @@ function assemble(){
     const instructions = [];
     for (const line of lines) {
         try {
-            const byteCode = parseLine(line);
-            instructions.push(byteCode);        
+            const instruction = parseLine(line);
+            instructions.push(instruction);        
         }
         catch (err) {
             console.error(err);

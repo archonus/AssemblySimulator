@@ -108,11 +108,11 @@ const processor = {
 
     getOperand2(addressMode, op2) {
         switch (addressMode) {
-            case 0:
-                throw new Error("Not implemented");
+            case 0: // Immediate addressing
+                return op2;
             case 1: // Register
                 return this.getRegisterValue(op2);
-            case 2: // Memory
+            case 2: // Direct addressing
                 return this.getMemoryValue(op2);
             default:
                 throw new Error("Invalid address mode");
@@ -209,13 +209,21 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
     let operand2;
     let addressMode;
     if(op2String[0] == 'R'){
-        addressMode = 1 // Register contents
+        addressMode = 1; // Register contents
         if(opcode == 3){ // Str requires second operand to be mref
             throw new Error("Str requires a memory address as second operand")
         }
         else{
             operand2 = parseRegister(op2String);
         }
+    }
+    else if(op2String[0] == '#'){
+        addressMode = 0;
+        if(opcode == 3){ // Str requires second operand to be mref
+            throw new Error("Str requires a memory address as second operand")
+        }
+        operand2 = parseInt(op2String);
+
     }
     else{
         addressMode = 2 // Mref

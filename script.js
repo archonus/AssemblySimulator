@@ -13,12 +13,16 @@ class instruction{
     static get haltInstr(){
         return new instruction(0,0,0,0);
     }
-    get Op2Size(){
+    static get Op2Size(){
         return Math.max(processor.r_bits, processor.m_bits);
     }
 
+    static get maxOp2Value(){
+        return Math.pow(2, instruction.Op2Size);
+    }
+
     get instructionSize(){
-        return this.OPCODE_SIZE + numBits(this.ADDRESS_MODES) + processor.r_bits + this.Op2Size;
+        return this.OPCODE_SIZE + numBits(this.ADDRESS_MODES) + processor.r_bits + instruction.Op2Size;
     }
     static getBinaryRepresentation(num, length){
         return num.toString(2).padStart(length,'0');
@@ -28,7 +32,7 @@ class instruction{
         return instruction.getBinaryRepresentation(this.opcode, this.OPCODE_SIZE) 
         + instruction.getBinaryRepresentation(this.addressMode,numBits(this.ADDRESS_MODES)) 
         + instruction.getBinaryRepresentation(this.regNum,processor.r_bits) 
-        + instruction.getBinaryRepresentation(this.operand2,this.Op2Size);
+        + instruction.getBinaryRepresentation(this.operand2,instruction.Op2Size);
     }
 }
 
@@ -222,7 +226,10 @@ function parseOperand2(op2String,opcode){ // TODO: Make opcode and address mode 
         if(opcode == 3){ // Str requires second operand to be mref
             throw new Error("Str requires a memory address as second operand")
         }
-        operand2 = parseInt(op2String);
+        operand2 = parseInt(op2String.substring(1));
+        if (operand2 > instruction.maxOp2Value){
+            throw new Error("Operand 2 is too large to use immediate addressing");
+        }
 
     }
     else{

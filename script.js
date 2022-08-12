@@ -211,7 +211,7 @@
                     if(this.zero_flag) this.branch(instr);
                     break;
                 case 7:
-                    if(!this.neg_flag) this.branch(instr);
+                    if(this.neg_flag) this.branch(instr);
                     break;
                 case 5:
                     this.branch(instr);

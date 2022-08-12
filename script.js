@@ -7,8 +7,8 @@
             this.regNum = regNum;
             this.operand2 = op2;
         }
-        OPCODE_SIZE = 3; // Number of bits for the opcodes
-        ADDRESS_MODES = 3;
+        static OPCODE_SIZE = 3; // Number of bits for the opcodes
+        static ADDRESS_MODES = 3;
 
         static get haltInstr(){
             return new instruction(0,0,0,0);
@@ -22,15 +22,15 @@
         }
 
         get instructionSize(){
-            return this.OPCODE_SIZE + numBits(this.ADDRESS_MODES) + processor.r_bits + instruction.Op2Size;
+            return this.OPCODE_SIZE + numBits(instruction.ADDRESS_MODES) + processor.r_bits + instruction.Op2Size;
         }
         static getBinaryRepresentation(num, length){
             return num.toString(2).padStart(length,'0');
         }
 
         toString(){
-            return instruction.getBinaryRepresentation(this.opcode, this.OPCODE_SIZE) 
-            + instruction.getBinaryRepresentation(this.addressMode,numBits(this.ADDRESS_MODES)) 
+            return instruction.getBinaryRepresentation(this.opcode, instruction.OPCODE_SIZE) 
+            + instruction.getBinaryRepresentation(this.addressMode,numBits(instruction.ADDRESS_MODES)) 
             + instruction.getBinaryRepresentation(this.regNum,processor.r_bits) 
             + instruction.getBinaryRepresentation(this.operand2,instruction.Op2Size);
         }
@@ -298,17 +298,17 @@
         let num = processor.labels[label];
         if(isNaN(num)){throw new Error('Label undefined')}
         let numBit = instruction.Op2Size;
-        let rem = num & Math.pow(2,numBits);
+        let rem = num % Math.pow(2,numBit);
         instr.operand2 = rem;
         num = num >> numBit;
 
         numBit = processor.r_bits;
-        rem = num & Math.pow(2,numBit);
+        rem = num % Math.pow(2,numBit);
         instr.regNum = rem;
         num = num >> numBit;
 
         numBit = numBits(instruction.ADDRESS_MODES);
-        rem = num & Math.pow(2,numBit);
+        rem = num % Math.pow(2,numBit);
         instr.addressMode = rem;
         num = num >> numBit;
 

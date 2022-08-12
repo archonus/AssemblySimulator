@@ -142,7 +142,7 @@
             this.labels = {};
             this.zero_flag = false;
             this.neg_flag = false;
-            textArea_output.value = '';
+            txtArea_output.value = '';
         },
 
         set_flags(result){
@@ -400,9 +400,6 @@
 
     function reset(){
         processor.reset();
-        for (let i = 0; i < processor.m.length; i++){
-            processor.setMemory(i,0);
-        }
     }
 
     function autoResize(){

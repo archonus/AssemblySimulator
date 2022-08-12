@@ -142,6 +142,7 @@
             this.labels = {};
             this.zero_flag = false;
             this.neg_flag = false;
+            textArea_output.value = '';
         },
 
         set_flags(result){

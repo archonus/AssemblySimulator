@@ -22,7 +22,7 @@
         }
 
         get instructionSize(){
-            return this.OPCODE_SIZE + numBits(instruction.ADDRESS_MODES) + processor.r_bits + instruction.Op2Size;
+            return instruction.OPCODE_SIZE + numBits(instruction.ADDRESS_MODES) + processor.r_bits + instruction.Op2Size;
         }
         static getBinaryRepresentation(num, length){
             return num.toString(2).padStart(length,'0');
@@ -174,6 +174,13 @@
             this.set_flags(result);
 
         },
+        
+        branch(instr){
+            let index = instr.operand2;
+            index += instr.regNum >> instruction.Op2Size
+            index += instr.addressMode >> (instruction.Op2Size + numBits(instruction.ADDRESS_MODES))
+            this.PC = index;
+        },
 
         runCycle(){
             if(this.halted){
@@ -182,11 +189,9 @@
             const instr = this.instructions[this.PC]
             this.CIR = instr.toString();
             this.PC += 1
-            const opcode = instr.opcode;
-            const addressMode = instr.addressMode;
             const regNum = instr.regNum;
-            const op2 = this.getOperand2(addressMode, instr.operand2);
-            switch (opcode) {
+            const op2 = this.getOperand2(instr.addressMode, instr.operand2);
+            switch (instr.opcode) {
                 case 0:
                     this.halt();
                 case 1:
@@ -201,8 +206,15 @@
                 case 4:
                     this.compare(regNum,instr.operand2);
                     break;
+                case 6:
+                    if(this.zero_flag) this.branch(instr);
+                    break;
+                case 7:
+                    if(!this.neg_flag) this.branch(instr);
+                    break;
                 case 5:
-
+                    this.branch(instr);
+                    break;
                 default:
                     this.halt();
                     break;

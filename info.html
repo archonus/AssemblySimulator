@@ -6,7 +6,7 @@
     <body>
         <h1>Simulator Instruction Set</h1>
         <p>Four registers (R0 to R3)</p>
-        <p>Two bit opcode for four instructions:</p>
+        <p>Three bit opcode for eight instructions:</p>
         <ul>
             <li>HLT</li>
             <li>
@@ -17,10 +17,10 @@
             <li>
                 <h3>Branching</h3>
                 <ul>
-                    <li>CMP</li>
+                    <li>CMP Rn op2</li>
                     <li>B label</li>
                     <li>BEQ label</li>
-                    <li>BGT label</li>
+                    <li>BLT label</li>
                 </ul>
             </li>
             
@@ -28,6 +28,7 @@
         <p>2 operands, each 2 bits long</p>
         <p>Registers are indicated by Rn, where n is 0-3, and memory addresses are indicated by a number. Immediate addressing is indicated by #n</p>
         <p>op2 can be either a number (address mode 0), a register (address mode 1) or a memory address (address mode 2)</p>
+        <p>Branching can be conditional or unconditional</p>
         <a href="index.html">Back to Simulator</a>
     </body>
 </html>

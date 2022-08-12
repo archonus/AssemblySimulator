@@ -52,8 +52,8 @@ const processor = {
     labels:{},
     
     addLabel(labelName, index){
-        this.label[labelName] = index
-    }
+        this.labels[labelName] = index
+    },
     
     loadInstructions(instructions){
         this.instructions = instructions;
@@ -273,10 +273,8 @@ function parseOperand2(op2String,opcode){
     return {op2: operand2, adrMode : addressMode};
 }
 
-function parseLine(expr){
-    const parts = expr.toUpperCase().split(" ").filter(x => x != '') // Split by spaces and removing empty strings also
+function parseLine(parts, index){
     const op = parts[0];
-    const operands = parts.slice(1); // Array of operands
     let opcode;
     switch (op) {
         case 'HLT':
@@ -294,8 +292,15 @@ function parseLine(expr){
             opcode = 4;
             break;
         default:
-            throw Error("Not valid operation"); // Not valid
+            if(op.endsWith(':')){
+                processor.addLabel(op,index)
+                return parseLine(parts.slice(1), index) // Call parse line on the rest of the line, which the label refers to
+            }
+            else {
+                throw Error("Syntax Error"); // Not valid
+            }
     }
+    const operands = parts.slice(1); // Array of operands
     if (operands.length != 2){ // Needs 2 arguments
         throw new Error("Invalid syntax");
     }
@@ -309,9 +314,11 @@ function assemble(){
     const text = code_input.value;
     const lines = text.split('\n');
     const instructions = [];
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
         try {
-            const instruction = parseLine(line);
+            const line = lines[i]
+            const parts = line.toUpperCase().split(' ').filter(x => x != '') // Split by spaces and removing empty strings also
+            const instruction = parseLine(parts, i);
             instructions.push(instruction);        
         }
         catch (err) {

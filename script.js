@@ -52,13 +52,14 @@ const processor = {
     labels:{},
     
     addLabel(labelName, index){
-        this.labels[labelName] = index
+        if (labelName in this.labels){
+            throw Error('Label already exists');
+        }
+        this.labels[labelName] = index;
     },
     
     loadInstructions(instructions){
         this.instructions = instructions;
-        this.PC = 0;
-        this.halted = false;
         txtArea_output.value = instructions.map(instr => instr.toString()).join('\n');
     },
 
@@ -137,8 +138,10 @@ const processor = {
         for (let i = 0; i < this.r.length; i++) {
             this.setRegister(i, 0);
         }
-        txtArea_output.value = "";
         this.instructions = [];
+        this.labels = {};
+        this.zero_flag = false;
+        this.neg_flag = false;
     },
     
     set_flags(result){
@@ -231,9 +234,9 @@ function parseRegister(regString){
     if(regString[0] != 'R'){
         throw new Error("Not a register");
     }
-    let regNum = parseInt(regString.substring(1))
+    let regNum = parseInt(regString.substring(1));
     if(isValidRegister(regNum)){
-        return regNum
+        return regNum;
     }
     else{
         throw new Error("Invalid regiser number");
@@ -246,7 +249,7 @@ function parseOperand2(op2String,opcode){
     if(op2String[0] == 'R'){
         addressMode = 1; // Register contents: direct addressing
         if(opcode == 3){ // Str requires second operand to be mref
-            throw new Error("Str requires a memory address as second operand")
+            throw new Error("Str requires a memory address as second operand");
         }
         else{
             operand2 = parseRegister(op2String);
@@ -264,7 +267,7 @@ function parseOperand2(op2String,opcode){
 
     }
     else{
-        addressMode = 2 // Mref
+        addressMode = 2; // Mref
         operand2 = parseInt(op2String);
         if(!isValidMref(operand2)){
             throw new Error("Not a valid memory address");
@@ -293,8 +296,8 @@ function parseLine(parts, index){
             break;
         default:
             if(op.endsWith(':')){
-                processor.addLabel(op,index)
-                return parseLine(parts.slice(1), index) // Call parse line on the rest of the line, which the label refers to
+                processor.addLabel(op,index);
+                return parseLine(parts.slice(1), index); // Call parse line on the rest of the line, which the label refers to
             }
             else {
                 throw Error("Syntax Error"); // Not valid
@@ -310,7 +313,7 @@ function parseLine(parts, index){
 }
 
 function assemble(){
-    txtArea_output.innerHTML = "";
+    processor.reset();
     const text = code_input.value;
     const lines = text.split('\n');
     const instructions = [];
@@ -323,6 +326,7 @@ function assemble(){
         }
         catch (err) {
             console.error(err);
+            txtArea_output.value = "";
             return;
             // TODO Display error message            
         }

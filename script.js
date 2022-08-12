@@ -189,7 +189,10 @@ const processor = {
                 break;
             case 3:
                 this.store(regNum,instr.operand2);
-                break;       
+                break;
+            case 4:
+                this.compare(regNum,instr.operand2);
+                break;
             default:
                 this.halt();
                 break;
@@ -281,7 +284,10 @@ function parseLine(expr){
             break;
         case 'STR':
             opcode = 3;
-            break;    
+            break;
+        case 'CMP':
+            opcode = 4;
+            break;
         default:
             throw Error("Not valid operation"); // Not valid
     }

@@ -47,6 +47,7 @@ const processor = {
     m:[0,0,0,0],
     halted:false,
     instructions:[],
+    zero_flag = False, // TODO Display flag
 
     loadInstructions(instructions){
         this.instructions = instructions;
@@ -136,7 +137,11 @@ const processor = {
 
     add(regNum, op2){
         const x = this.getRegisterValue(regNum);
-        this.setRegister(regNum,x+op2);
+        result = x + op2;
+        this.setRegister(regNum,result);
+        if(result == 0){
+            zero_flag = True;
+        }
     },
     mov(regNum,op2){
         this.setRegister(regNum,op2);
@@ -220,7 +225,7 @@ function parseOperand2(op2String,opcode){
     let operand2;
     let addressMode;
     if(op2String[0] == 'R'){
-        addressMode = 1; // Register contents
+        addressMode = 1; // Register contents: direct addressing
         if(opcode == 3){ // Str requires second operand to be mref
             throw new Error("Str requires a memory address as second operand")
         }
@@ -229,7 +234,7 @@ function parseOperand2(op2String,opcode){
         }
     }
     else if(op2String[0] == '#'){
-        addressMode = 0;
+        addressMode = 0; //Immediate addressing
         if(opcode == 3){ // Str requires second operand to be mref
             throw new Error("Str requires a memory address as second operand")
         }

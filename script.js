@@ -49,7 +49,12 @@ const processor = {
     instructions:[],
     zero_flag:false,
     neg_flag:false,
-
+    labels:{},
+    
+    addLabel(labelName, index){
+        this.label[labelName] = index
+    }
+    
     loadInstructions(instructions){
         this.instructions = instructions;
         this.PC = 0;
@@ -269,7 +274,7 @@ function parseOperand2(op2String,opcode){
 }
 
 function parseLine(expr){
-    const parts = expr.toUpperCase().split(" ") // Split by spaces
+    const parts = expr.toUpperCase().split(" ").filter(x => x != '') // Split by spaces and removing empty strings also
     const op = parts[0];
     const operands = parts.slice(1); // Array of operands
     let opcode;

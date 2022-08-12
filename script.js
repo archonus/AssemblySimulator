@@ -47,8 +47,8 @@ const processor = {
     m:[0,0,0,0],
     halted:false,
     instructions:[],
-    zero_flag = false,
-    neg_flag = false,
+    zero_flag:false,
+    neg_flag:false,
 
     loadInstructions(instructions){
         this.instructions = instructions;
@@ -139,11 +139,11 @@ const processor = {
     set_flags(result){
         this.zero_flag = result == 0 ? true : false
         this.neg_flag = result < 0 ? true : false
-    }
+    },
 
     add(regNum, op2){
         const x = this.getRegisterValue(regNum);
-        result = x + op2;
+        const result = x + op2;
         this.setRegister(regNum,result);
         this.set_flags(result)
     },
@@ -162,10 +162,10 @@ const processor = {
         
     compare(regNum, op2){
         const x = this.getRegisterValue(regNum);
-        result = x - op2;
+        const result = x - op2;
         this.set_flags(result);
         
-    }
+    },
 
     runCycle(){
         if(this.halted){

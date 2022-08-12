@@ -7,7 +7,7 @@ class instruction{
         this.regNum = regNum;
         this.operand2 = op2;
     }
-    OPCODE_SIZE = 2;
+    OPCODE_SIZE = 3;
     ADDRESS_MODES = 3;
 
     static get haltInstr(){
@@ -39,7 +39,7 @@ class instruction{
 function numBits(n){
     return Math.ceil(Math.log2(n));
 }
-
+// TODO Display flags
 const processor = {
     r:[0,0,0,0],
     pc:0,
@@ -47,7 +47,8 @@ const processor = {
     m:[0,0,0,0],
     halted:false,
     instructions:[],
-    zero_flag = False, // TODO Display flag
+    zero_flag = false,
+    neg_flag = false,
 
     loadInstructions(instructions){
         this.instructions = instructions;
@@ -134,14 +135,17 @@ const processor = {
         txtArea_output.value = "";
         this.instructions = [];
     },
+    
+    set_flags(result){
+        this.zero_flag = result == 0 ? true : false
+        this.neg_flag = result < 0 ? true : false
+    }
 
     add(regNum, op2){
         const x = this.getRegisterValue(regNum);
         result = x + op2;
         this.setRegister(regNum,result);
-        if(result == 0){
-            zero_flag = True;
-        }
+        this.set_flags(result)
     },
     mov(regNum,op2){
         this.setRegister(regNum,op2);
@@ -155,6 +159,13 @@ const processor = {
         const x = this.getRegisterValue(regNum);
         this.setMemory(mref,x);
     },
+        
+    compare(regNum, op2){
+        const x = this.getRegisterValue(regNum);
+        result = x - op2;
+        this.set_flags(result);
+        
+    }
 
     runCycle(){
         if(this.halted){

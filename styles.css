@@ -11,6 +11,10 @@ label{
     text-align: center;
 }
 
+td {
+    text-align: center;
+}
+
 .txtbox{
     width: 10em;
     height: 1em;
